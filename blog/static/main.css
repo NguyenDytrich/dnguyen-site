@@ -1,5 +1,10 @@
 	@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=STIX+Two+Text:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+	:root {
+		--color-main: #3b4252;
+		--link-color: #5e81ac;
+	}
+
 	html, body, p, h1, h2, h3, h4, h5, h6 {
 		padding: 0;
 		margin: 0;
@@ -9,9 +14,49 @@
 		-moz-osx-font-smoothing: auto;
 	}
 
-	a {
+	a.highlight {
 		cursor: pointer;
+		color: var(--link-color);
+		position: relative;
+
+		padding: 0 2px;
+		padding-bottom: 2px;
+		text-decoration: none;
+		color: var(--color-main);
+
+		/* background-image: linear-gradient(to bottom, #f27121 0%, #f27121 100%); */
+		background-image: linear-gradient(to bottom, #d8dee9 0%, #d8dee9 100%);
+		background-position: 0 100%;
+		background-repeat: repeat-x;
+		background-size: 1px 1px;
+		transition: background-size 0.2s ease-in-out;
+
 	}
+
+	a.highlight:hover {
+		background-size: 4px 1.6em;
+	}
+
+	/*
+	a.highlight::after {
+		opacity: 0;
+		-webkit-transition: all 0.2s;
+		transition: all 0.2s;
+		content: "";
+		z-index: -1;
+		left: -0.75em;
+		top: 0.1em;
+		border: 1.5em solid #eceff4;
+		border-bottom: transparent;
+		border-radius: 10px;
+		position: absolute;
+		width: calc(100% - 1.5em);
+	}
+
+	a.highlight:hover::after {
+		opacity: 1;
+	}
+	*/
 
 	/* Layout */
 	body {
@@ -59,7 +104,7 @@
 	}
 
 	.blog-heading a {
-		color: black;
+		color: var(--color-main);
 		text-decoration: none;
 	}
 
@@ -86,11 +131,11 @@
 	}
 
 	footer a {
-		color: black;
+		color: var(--color-main);
 	}
 
 	footer a:visited {
-		color: black;
+		color: var(--color-main);
 	}
 	/* End Layout */
 
@@ -132,7 +177,7 @@
 
 	.nav {
 		letter-spacing: 0.1em;
-		font-family: 'STIX Two Text';
+		/* font-family: 'STIX Two Text'; */
 		font-weight: normal;
 		font-size: 2.25em;
 	}
@@ -170,9 +215,10 @@
 		padding: 0 2px;
 		padding-bottom: 2px;
 		text-decoration: none;
-		color: black;
+		color: var(--color-main);
 
-		background-image: linear-gradient(to bottom, #f27121 0%, #f27121 100%);
+		/* background-image: linear-gradient(to bottom, #f27121 0%, #f27121 100%); */
+		background-image: linear-gradient(to bottom, #d8dee9 0%, #d8dee9 100%);
 		background-position: 0 100%;
 		background-repeat: repeat-x;
 		background-size: 1px 1px;
@@ -183,7 +229,7 @@
 		background-size: 4px 15px;
 	}
 	.hover-hl:visited {
-		color: black;
+		color: var(--color-main);
 		text-decoration: none;
 	}
 
@@ -203,8 +249,11 @@
 		font-size: 0.75em;
 	}
 
-#version-info {
+#footer-right {
 	position: relative;
+}
+
+#version-info {
 	display: flex;
 	justify-content: right;
 	gap: 1em;
@@ -212,8 +261,6 @@
 }
 
 #version-info > span {
-	position: absolute;
-	bottom: 0;
 	white-space: pre;
 }
 
