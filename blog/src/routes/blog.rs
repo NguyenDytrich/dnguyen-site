@@ -42,7 +42,8 @@ async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
         mapped_posts.insert(0, post);
     }
 
-    return mapped_posts;
+    mapped_posts.reverse();
+    mapped_posts
 }
 
 #[get("/")]
@@ -52,7 +53,8 @@ pub async fn blog_index() -> Template {
 
     // Calculate pagination
     let count = posts::get_post_count().await.unwrap_or(0);
-    let pages = count as i64 / num_retrieved;
+    let pages = count as f64 / num_retrieved as f64;
+    let pages = pages.ceil() as i64;
     let next = pages > 1;
     let pages = if pages > 0 {pages} else {1};
 
@@ -80,8 +82,10 @@ pub async fn blog(page: usize) -> Template {
 
     // Calculate pagination
     let count = posts::get_post_count().await.unwrap_or(0);
-    let pages = count as i64 / num_retrieved;
-    let next = pages > page as i64;
+    let pages = count as f64 / num_retrieved as f64;
+    let pages = pages.ceil() as i64;
+    let next = pages > 1;
+    let pages = if pages > 0 {pages} else {1};
     let prev = page > 1;
 
     Template::render("blog/blog_index", context! {

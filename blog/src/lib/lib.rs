@@ -87,7 +87,7 @@ pub mod htmlify {
         fn it_transcribes_md_as_html() {
             let input = "Hello world, [this is](http://www.google.com/) ~~a~~ *an* example.";
             let result = transcribe(input);
-            let expected = "<p>Hello world, <a href=\"http://www.google.com/\" rel=\"noopener noreferrer\">this is</a> <del>a</del> <em>an</em> example.</p>\n";
+            let expected = "<p>Hello world, <a href=\"http://www.google.com/\">this is</a> <del>a</del> <em>an</em> example.</p>\n";
 
             assert_eq!(expected, &result);
         }

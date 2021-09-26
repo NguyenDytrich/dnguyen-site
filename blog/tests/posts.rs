@@ -20,7 +20,6 @@ async fn it_gets_recents() {
     // Since new UUIDs are pushed into a vector, the last
     // element of `uuids` should be equal to the first
     // element of posts.
-    
     for post in posts.iter() {
         assert_eq!(post.uuid, uuids.pop().unwrap());
     }
