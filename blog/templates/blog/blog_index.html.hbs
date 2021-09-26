@@ -5,7 +5,7 @@
 	<li>
 		<div>
 			<div class="blog-heading">
-				<h2><a href="/blog/{{uuid_repr}}">{{title}}</a></h2>
+				<h2><a href="/{{uuid_repr}}">{{title}}</a></h2>
 				<div class="date">{{date_repr}}</div>
 			</div>
 			<div class="blog-preview">
@@ -24,11 +24,11 @@
 <div class="text-center">
 	{{#with paginate}}
 		{{#if prev}}
-		<a href="/blog?page={{prev_page}}">prev</a>
+		<a href="/?page={{prev_page}}">prev</a>
 		{{/if}}
 		{{current}} of {{total}}
 		{{#if next}}
-		<a href="/blog?page={{next_page}}">next</a>
+		<a href="/?page={{next_page}}">next</a>
 		{{/if}}
 	{{/with}}
 </div>
