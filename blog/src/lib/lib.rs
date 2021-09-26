@@ -52,20 +52,22 @@ pub mod db {
 }
 
 pub mod htmlify {
-    use ammonia::clean;
-    use pulldown_cmark::{Parser, Options, html::push_html};
-
     /// Takes a string formatted in Markdown and returns it as sanitized HTML
     pub fn transcribe(markdown: &str) -> String {
-        let mut options = Options::empty();
-        options.insert(Options::ENABLE_TABLES);
-        options.insert(Options::ENABLE_STRIKETHROUGH);
-        let parser = Parser::new_ext(markdown, options);
-
+        let mut pandoc = pandoc::new();
+        pandoc.set_input(pandoc::InputKind::Pipe(markdown.into()));
+        pandoc.set_output_format(
+            pandoc::OutputFormat::Html5,
+            vec![
+            ]
+        );
+        pandoc.set_output(pandoc::OutputKind::Pipe);
         // String buffer output
-        let mut out = String::new();
-        push_html(&mut out, parser);
-        clean(&*out)
+        let res = pandoc.execute().unwrap();
+        match res {
+            pandoc::PandocOutput::ToBuffer(s) => s,
+            _ => String::new()
+        }
     }
 
     pub fn monthify(num: usize) -> Option<String> {
