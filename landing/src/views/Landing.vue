@@ -2,16 +2,23 @@
   <div class="landing">
     <div class="landing-container">
       <div class="header">
-        <span>Hi, I'm <span class="underline">Dytrich</span>.</span>
+        <span class="underline-container"
+          >Hi, I'm <span class="underline">Dytrich</span>.</span
+        >
       </div>
       <div class="gradient">
         I <span class="reveal">code</span>, make
         <span class="reveal">music</span>, and take
         <span class="reveal">pictures</span>.
       </div>
-      <router-link to="/about"
-        ><div class="learn-more">Learn more</div></router-link
-      >
+      <div style="display: flex; justify-content: center">
+        <div class="learn-more">
+          <router-link to="/about">Learn more</router-link>
+        </div>
+        <div class="learn-more">
+          <a href="https://blog.dytrich-nguyen">Blog</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -22,7 +29,6 @@ export default class Landing extends Vue {}
 </script>
 <style scoped lang="scss">
 .landing {
-  font-family: "Lato", sans-serif;
   letter-spacing: 2px;
   font-size: 2rem;
 }
@@ -56,24 +62,37 @@ export default class Landing extends Vue {}
   width: 30%;
   padding: 0.5rem 0.5rem;
   margin: 1em auto 0 auto;
-  background: #2c3e50;
+  background: #3b4252;
   color: white;
 
   border: 2px solid #2c3e50;
+  cursor: pointer;
+
+  transition: opacity 0.3s ease-in-out;
+
+  a {
+    color: inherit;
+
+    &:visited {
+      color: inherit;
+    }
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 a {
   text-decoration: none;
 
-  transition: opacity 0.3s;
-
   &:visited {
     color: #2c3e50;
   }
+}
 
-  &:hover {
-    opacity: 0.7;
-  }
+.underline-container {
+  position: relative;
 }
 
 .underline {
@@ -82,8 +101,8 @@ a {
     z-index: -1;
     content: "";
     position: absolute;
-    height: 3px;
-    margin: 5px 0 0;
+    height: 4px;
+    margin: 6px 0 0;
 
     transition: all 0.3s ease-in-out;
     background: #f27121;
@@ -91,7 +110,7 @@ a {
     border-radius: 10px;
 
     /* underline anim */
-    top: 2em;
+    top: 0.85em;
     left: 4.57em;
     width: 0;
     animation-name: slide;
@@ -129,14 +148,14 @@ a {
 @keyframes slide {
   0% {
     width: 0;
-    left: 4.57em;
+    left: 3.75em;
   }
   25% {
-    width: 3.65em;
-    left: 4.57em;
+    width: 3.825em;
+    left: 3.75em;
   }
   50% {
-    left: calc(4.57em + 3.65em);
+    left: calc(3.75em + 3.825em);
     width: 0;
   }
 }

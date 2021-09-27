@@ -10,7 +10,6 @@
   // div {
   //   box-shadow: 1px 1px 2px 0px gray;
   // }
-  font-family: Lato, sans-serif;
 }
 
 h1 {
@@ -43,7 +42,7 @@ h1 {
   h2 {
     //grid-area: 1 / 1 / 1 / -1;
     margin: auto 0;
-    letter-spacing: 1px;
+    letter-spacing: 0.01em;
     font-weight: normal;
   }
   p {
@@ -52,18 +51,20 @@ h1 {
   }
 
   a {
-    padding: 0 2px;
+    padding: 0 4px;
     color: #2c3e50;
     text-decoration: none;
 
-    background-image: linear-gradient(to bottom, #f27121 0%, #f27121 100%);
+    /* background-image: linear-gradient(to bottom, #f27121 0%, #f27121 100%); */
+    background-image: linear-gradient(to bottom, #f58d4d 0%, #f58d4d 100%);
     background-position: 0 100%;
     background-repeat: repeat-x;
     background-size: 1px 1px;
-    transition: background-size 0.3s ease-in-out;
+    transition: background-size 0.2s ease-in-out;
 
     &:hover {
-      background-size: 4px 50px;
+      background-size: 4px 1.65em;
+			color: #2e3440;
     }
   }
   div {

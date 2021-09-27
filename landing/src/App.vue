@@ -30,21 +30,32 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata&family=Inter&family=Noto+Sans+JP&display=swap");
 
 body {
+  font-size: 16px;
   margin: 0;
   padding: 0;
+  color: #3b4252;
+  line-height: 26px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Noto Sans JP";
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   //background-color: #f0ece3;
   //background-color: #222831;
   background: white;
-  color: #2c3e50;
 
   height: 100vh;
   display: grid;
@@ -53,7 +64,6 @@ body {
 }
 
 #nav {
-  font-family: "Lato", sans-serif;
   letter-spacing: 0.02rem;
   padding-top: 2rem;
 
