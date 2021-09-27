@@ -96,7 +96,12 @@ pub async fn blog_index() -> Template {
 }
 
 #[get("/?<page>")]
-pub async fn blog(page: usize) -> Template {
+pub async fn blog(mut page: isize) -> Template {
+
+    if page <= 0 {
+        page = 1;
+    }
+
     let num_retrieved = 5;
     let mapped_posts = aggregate_blog_posts(
         num_retrieved, num_retrieved * (page - 1) as i64
