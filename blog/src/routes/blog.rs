@@ -9,6 +9,32 @@ use dnguyen_blog::http::dto::BlogPostPreview;
 use chrono::prelude::*;
 use uuid::Uuid;
 
+fn gen_preview(markdown: &str) -> String {
+    if markdown.len() > 300 {
+        // String buffer
+        let mut preview = String::new();
+        // possible end of word chars
+        let c_eow = [' ', '\n', '\r'];
+
+        // index of end of word
+        let mut i_eow = 255;
+        let mut c: char = 'a'; // arbitrarily assign a char to start
+
+        while !c_eow.contains(&c) {
+            // Unwrap otherwise stop the search if index is OOB
+            c = markdown.chars().nth(i_eow).unwrap_or(' ');
+            i_eow = i_eow + 1;
+        }
+
+        preview.push_str(&markdown[0..(i_eow - 1)]);
+        preview.push_str("...");
+        preview
+
+    } else {
+        markdown.to_owned()
+    }
+}
+
 async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
     let posts: Vec<BlogPost> = posts::retrieve_with_offset(count, offset)
         .await
@@ -21,14 +47,17 @@ async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
             Some(d) => (d.day(), d.month(), d.year()),
             None => (p.created_at.day(), p.created_at.month(), p.created_at.year())
         };
-        let markdown = p.markdown.to_owned().unwrap_or(String::new());
-        let mut preview = String::new();
-        if markdown.len() > 300 {
-            preview.push_str(&markdown[1..=255]);
-            preview.push_str("...");
-        } else {
-            preview = markdown;
-        }
+        // let markdown = p.markdown.to_owned().unwrap_or(String::new());
+        // let mut preview = String::new();
+        // if markdown.len() > 300 {
+        //     preview.push_str(&markdown[0..=255]);
+        //     preview.push_str("...");
+        // } else {
+        //     preview = markdown;
+        // }
+        let preview = gen_preview(
+            &p.markdown.to_owned().unwrap_or(String::new())
+        );
 
         let post = BlogPostPreview {
             uuid_repr: p.uuid.to_string(),
@@ -37,7 +66,7 @@ async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
                 date.0, 
                 monthify(date.1 as usize).unwrap_or("ERR".to_string()),
                 date.2),
-            preview: preview
+            preview: transcribe(&preview)
         };
         mapped_posts.insert(0, post);
     }
