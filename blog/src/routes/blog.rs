@@ -47,14 +47,7 @@ async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
             Some(d) => (d.day(), d.month(), d.year()),
             None => (p.created_at.day(), p.created_at.month(), p.created_at.year())
         };
-        // let markdown = p.markdown.to_owned().unwrap_or(String::new());
-        // let mut preview = String::new();
-        // if markdown.len() > 300 {
-        //     preview.push_str(&markdown[0..=255]);
-        //     preview.push_str("...");
-        // } else {
-        //     preview = markdown;
-        // }
+
         let preview = gen_preview(
             &p.markdown.to_owned().unwrap_or(String::new())
         );
@@ -113,23 +106,32 @@ pub async fn blog(page: usize) -> Template {
     let count = posts::get_post_count().await.unwrap_or(0);
     let pages = count as f64 / num_retrieved as f64;
     let pages = pages.ceil() as i64;
-    let next = pages > 1;
+    let next = pages > page as i64;
     let pages = if pages > 0 {pages} else {1};
     let prev = page > 1;
 
-    Template::render("blog/blog_index", context! {
-        title: "Blog",
-        parent: "layout",
-        blog_posts: mapped_posts,
-        paginate: context! {
-            prev: prev,
-            next: next,
-            current: page,
-            next_page: page + 1,
-            prev_page: page - 1,
-            total: pages
-        }
-    })
+    if pages >= page as i64 {
+        Template::render("blog/blog_index", context! {
+            title: "Blog",
+            parent: "layout",
+            blog_posts: mapped_posts,
+            paginate: context! {
+                prev: prev,
+                next: next,
+                current: page,
+                next_page: page + 1,
+                prev_page: page - 1,
+                total: pages
+            }
+        })
+    } else {
+        Template::render(
+            "error/404", context! {
+                title: "404",
+                parent: "layout"
+            }
+        )
+    }
 
 }
 
