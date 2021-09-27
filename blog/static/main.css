@@ -94,13 +94,23 @@
 	.blog-heading {
 		display: flex;
 		justify-content: space-between;
+		gap: 2em;
 		align-items: baseline;
 		margin-bottom: 0.5em;
 		margin-top: 3em;
 	}
 
+	.blog-heading > .date {
+		/* nord 3 */
+		color: #4c566a;
+		width: max-content;
+		flex-shrink: 0;
+	}
+
 	.blog-heading > h2 {
 		letter-spacing: 0.05em;
+		display: block;
+		flex-shrink: 2;
 	}
 
 	.blog-heading a {
