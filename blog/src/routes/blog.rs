@@ -80,6 +80,14 @@ pub async fn blog_index() -> Template {
     let next = pages > 1;
     let pages = if pages > 0 {pages} else {1};
 
+    // Show no posts if there are no posts
+    if count == 0 {
+        return Template::render("blog/no_posts", context! {
+            title: "Blog",
+            parent: "layout"
+        });
+    }
+
     Template::render("blog/blog_index", context! {
         title: "Blog",
         parent: "layout",
@@ -114,6 +122,14 @@ pub async fn blog(mut page: isize) -> Template {
     let next = pages > page as i64;
     let pages = if pages > 0 {pages} else {1};
     let prev = page > 1;
+
+    // Show no posts if there are no posts
+    if count == 0 {
+        return Template::render("blog/no_posts", context! {
+            title: "Blog",
+            parent: "layout"
+        });
+    }
 
     if pages >= page as i64 {
         Template::render("blog/blog_index", context! {
