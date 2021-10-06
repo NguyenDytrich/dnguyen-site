@@ -1,12 +1,12 @@
 <template>
-  <div class="sidenav">
+  <div id="greeting">
     <!--
     <div class="greeting">
       <div class="header">Hi, I'm Dytrich.</div>
       <div>I code, make music, and take pictures.</div>
     </div>
     -->
-    <div class="links">
+    <div id="links">
       <ul>
         <li><router-link to="/about">About</router-link></li>
         <li><router-link to="/music">Music</router-link></li>
@@ -24,7 +24,7 @@ export default class SideNav extends Vue {}
 </script>
 
 <style scoped lang="scss">
-.sidenav {
+#greeting {
   padding: 1em;
 }
 
