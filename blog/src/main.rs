@@ -3,6 +3,7 @@ use rocket::fs::{FileServer, relative};
 use rocket_dyn_templates::Template;
 
 use dotenv::dotenv;
+use std::env;
 
 mod routes;
 
@@ -18,13 +19,15 @@ fn not_found() -> Template {
 async fn main() {
     dotenv().ok();
 
+    let static_dir = &env::var("STATIC_DIR").unwrap_or(relative!("/static").to_string());
+
     let _server = rocket::build()
         .mount("/", routes![
                 routes::blog::blog_index,
                 routes::blog::blog_post,
                 routes::blog::blog,
             ])
-        .mount("/static", FileServer::from(relative!("/static")))
+        .mount("/static", FileServer::from(static_dir))
         .register("/", catchers![not_found])
         .attach(Template::fairing())
         .launch()
