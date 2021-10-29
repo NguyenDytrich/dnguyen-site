@@ -37,3 +37,4 @@ macro_rules! context {
 }
 
 pub mod blog;
+pub mod console;

@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Dytrich Nguyen - Console</title>
+		<link rel="stylesheet" href="/static/main.min.css">
+		<link rel="stylesheet" href="/static/highlighting.min.css">
+		<link rel="stylesheet" href="/static/console.css"
+	</head>
+	<body>
+		<script type="module">
+			import { createApp } from 'https://unpkg.com/petite-vue?module'
+			createApp({
+				$delimiters: ['${', '}'],
+				html: '',
+				markdown: '',
+				callTimer: -1,
+				get rendered() {
+					return this.html
+				},
+				callApi() {
+					const res = fetch('http://localhost:8000/api/preview', {
+						method: 'POST',
+						body: this.markdown
+					}).then(res => {
+						res.text().then(t => {
+							this.html = t
+						})
+					})
+				},
+				resetTimer() {
+					clearTimeout(this.callTimer)
+					this.callTimer = setTimeout(this.callApi, 500)
+				}
+			}).mount('#preview')
+		</script>
+		<div id="main">
+			<div id="preview" v-scope>
+				<div id="input">
+					<textarea v-model="markdown" @input="resetTimer"></textarea>
+				</div>
+				<div id="rendered" v-html="rendered" @mounted="callApi"></div>
+			</div>
+		</div>
+		{{> footer}}
+	</body>
+</html>

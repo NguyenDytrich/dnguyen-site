@@ -1,0 +1,30 @@
+#main {
+	width: 100vw;
+	height: 80vh;
+}
+
+#preview {
+	display: flex;
+	width: calc(100% - 2em);
+	padding: 1em;
+	justify-content: space-between;
+}
+
+#preview > div {
+	flex-grow: 1;
+	width: 100%;
+}
+
+#rendered {
+	overflow-y: scroll;
+	max-height: 80vh;
+	padding: 0 1em;
+}
+
+#input > textarea {
+	font: inherit;
+	color: inherit;
+	width: calc(100% - 1em);
+	resize: none;
+	min-height: calc(80vh - 2em);
+}

@@ -27,6 +27,8 @@ async fn main() {
                 routes::blog::blog_post,
                 routes::blog::blog,
             ])
+        .mount("/console", routes![routes::console::console_index])
+        .mount("/api", routes![routes::console::gen_preview])
         .mount("/static", FileServer::from(static_dir))
         .register("/", catchers![not_found])
         .attach(Template::fairing())
