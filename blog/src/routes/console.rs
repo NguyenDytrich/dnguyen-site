@@ -3,9 +3,9 @@ use rocket_dyn_templates::Template;
 
 use dnguyen_blog::htmlify::transcribe;
 
-#[get("/")]
+#[get("/editor")]
 pub async fn console_index() -> Template {
-    return Template::render("console/console_index", {});
+    return Template::render("console/post_editor", {});
 }
 
 #[post("/preview", data="<content>")]
