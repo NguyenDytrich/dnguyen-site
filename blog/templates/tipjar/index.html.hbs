@@ -1,0 +1,95 @@
+{{#*inline "styles"}}
+<link rel="stylesheet" href="/static/tipjar.css">
+{{/inline}}
+
+{{#*inline "page"}}
+<script type="module">
+	import { createApp } from 'https://unpkg.com/petite-vue?module'
+
+		createApp({
+			$delimiters: ['${', '}'],
+			tipAmount: 1,
+			incTip() {
+				this.tipAmount++
+			},
+			decTip() {
+				if (this.tipAmount > 1) this.tipAmount--
+			},
+			callApi() {
+				const res = fetch('http://localhost:8000/api/preview', {
+					method: 'POST',
+					body: this.markdown
+				}).then(res => {
+					res.text().then(t => {
+						this.html = t
+					})
+				})
+			},
+		}).mount()
+</script>
+
+<div v-scope>
+	<h1>Tip Jar</h1>
+	<form>
+		<div id="tipjar-container">
+			<h2>Amount</h2>
+			<div id="tip-amount">
+				<button id="tip-inc" @click.prevent="incTip">+</button>
+				<div id="tip-display">
+					<span id="currency">$</span><span id="amount">${tipAmount}</span>
+				</div>
+				<button id="tip-dec" @click.prevent="decTip">-</button>
+			</div>
+			<div>
+				<div>
+					<label for="message">Message (optional):</label>
+				</div>
+				<div>
+					<textarea id="message"></textarea>
+				</div>
+				<div id="contrib-checkbox">
+					<input name="contrib-opt-out" type="checkbox" />
+					<label for="contrib-opt-out">I would like my contribution to be <b>anonymised</b>.</label>
+				</div>
+			</div>
+			<h2>Payment Details</h2>
+			<div>
+				<label for="email">Email</label>
+				<input name="email" type="text" placeholder="your@email.com" />
+			</div>
+
+			<div>
+				<label for="cardholder-name">Cardholder Name</label>
+				<input name="cardholder-name" type="text" placeholder="Your Name" />
+			</div>
+
+			<div id="card-info">
+				<label for="card-number">Card Number</label>
+				<input name="card-number" type="text" placeholder="1234 1234 1234 1234" />
+				<div class="igroup-flex">
+					<div>
+						<label for="expiry">Expiry</label>
+						<input name="expiry" type="text" placeholder="MM / YY" />
+					</div>
+					<div>
+						<label for="cvc">CVC</label>
+						<input name="cvc" type="text" placeholder="CVC" />
+					</div>
+				</div>
+			</div>
+
+			<div class="igroup-flex">
+				<div>
+					<label for="country">Country</label>
+					<input name="country" type="text" placeholder="US" />
+				</div>
+				<div>
+					<label for="zipcode">Zip</label>
+					<input name="zipcode" type="text" placeholder="123456" />
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+{{/inline}}
+{{~> (parent)~}}

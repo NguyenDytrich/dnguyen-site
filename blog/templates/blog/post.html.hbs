@@ -1,7 +1,14 @@
 {{#*inline "page"}}
 <h1>{{title}}</h1>
+<div id="subtitle">
+	<div id="author">Dytrich Nguyen</div>
+	<div id="date">{{date_repr}}</div>
+</div>
 <div class="blog-content">
 	{{{ content }}}
+</div>
+<div id="postscript">
+	Did you enjoy this article? Consider signing up for email notifications whenever I write a new one!
 </div>
 {{/inline}}
 {{~> (parent)~}}

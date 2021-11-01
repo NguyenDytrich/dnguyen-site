@@ -27,6 +27,9 @@ async fn main() {
                 routes::blog::blog_post,
                 routes::blog::blog,
             ])
+        .mount("/tipjar", routes![
+               routes::tipjar::index,
+            ])
         .mount("/static", FileServer::from(static_dir))
         .register("/", catchers![not_found])
         .attach(Template::fairing())

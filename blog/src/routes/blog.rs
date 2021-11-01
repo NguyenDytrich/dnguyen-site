@@ -68,6 +68,16 @@ async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
     mapped_posts
 }
 
+fn stringify_publish_date(post: &BlogPost) -> String {
+    let date = post.published_at.unwrap_or(post.created_at);
+
+    format!("{:02}, {} {}", 
+        date.day(), 
+        monthify(date.month() as usize).unwrap_or("ERR".to_string()),
+        date.year()
+    )
+}
+
 #[get("/")]
 pub async fn blog_index() -> Template {
     let num_retrieved = 5;
@@ -169,8 +179,9 @@ pub async fn blog_post(post_id: String) -> Template {
     return match post {
         Some(v) => Template::render(
             "blog/post", context! {
-                title: v.title,
+                title: &v.title,
                 parent: "layout",
+                date_repr: stringify_publish_date(&v),               
                 content: transcribe(
                     // Parse the markdown to HTML
                     &v.markdown.unwrap_or(String::new())

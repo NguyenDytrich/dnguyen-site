@@ -309,3 +309,15 @@ h2 {
 #font-info div {
 	align-self: flex-end;
 }
+
+#postscript {
+	margin-top: 2em;
+	padding-top: 1em;
+	border-top: 1px solid var(--color-main);
+}
+
+#subtitle {
+	margin-top: 0.5em;
+	padding-bottom: 1em;
+	border-bottom: 1px solid var(--color-main);
+}

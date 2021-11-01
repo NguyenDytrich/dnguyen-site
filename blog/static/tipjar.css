@@ -1,0 +1,76 @@
+#amount {
+	border: none;
+	outline: none;
+	font: inherit;
+	font-size: 2em;
+	width: 2em;
+	color: inherit;
+}
+
+#tip-amount {
+	display: flex;
+}
+
+#tip-display {
+	flex-grow: 1;
+	text-align: center;
+}
+
+#tipjar-container input {
+	font: inherit;
+	color: inherit;
+}
+
+form label {
+	display: block;
+}
+
+#tipjar-container textarea {
+	width: calc(100% - 2em);
+	height: 5em;
+	resize: none;
+	font: inherit;
+	color: inherit;
+	border-radius: 10px;
+	border: 1px solid var(--color-main);
+	padding: 0.5em 1em;
+}
+
+#tipjar-container label {
+	margin-top: 1em;
+	margin-bottom: 0.25em;
+}
+
+#tipjar-container input {
+	width: calc(100% - 2em);
+	border-radius: 10px;
+	box-shadow: none;
+	border: 1px solid var(--color-main);
+	padding: 0.5em 1.0em;
+}
+
+#card-info {
+}
+
+.igroup-flex {
+	display: flex;
+	justify-content: space-between;
+}
+
+.igroup-flex div {
+	flex-shrink: 1;
+	max-width: calc(50% - 1em);
+}
+
+.content {
+	max-width: 25em;
+}
+
+#contrib-checkbox label {
+	display: inline-block;
+}
+
+#contrib-checkbox input {
+	display: inline-block;
+	width: auto;
+}
