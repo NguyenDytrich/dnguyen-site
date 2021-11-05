@@ -1,44 +1,44 @@
-{{#*inline "styles"}}
+{{#*inline "head"}}
 <link rel="stylesheet" href="/static/tipjar.css">
+<script src="https://js.stripe.com/v3/"></script>
+<script type="module" src="/static/tipjar.js"></script>
 {{/inline}}
 
 {{#*inline "page"}}
-<script type="module">
-	import { createApp } from 'https://unpkg.com/petite-vue?module'
-
-		createApp({
-			$delimiters: ['${', '}'],
-			tipAmount: 1,
-			incTip() {
-				this.tipAmount++
-			},
-			decTip() {
-				if (this.tipAmount > 1) this.tipAmount--
-			},
-			callApi() {
-				const res = fetch('http://localhost:8000/api/preview', {
-					method: 'POST',
-					body: this.markdown
-				}).then(res => {
-					res.text().then(t => {
-						this.html = t
-					})
-				})
-			},
-		}).mount()
-</script>
-
-<div v-scope>
+<div vscope>
 	<h1>Tip Jar</h1>
-	<form>
+	<form id="payment-form">
 		<div id="tipjar-container">
 			<h2>Amount</h2>
 			<div id="tip-amount">
-				<button id="tip-inc" @click.prevent="incTip">+</button>
-				<div id="tip-display">
-					<span id="currency">$</span><span id="amount">${tipAmount}</span>
+				<div id="tip-opt">
+					<div>
+						<input type="radio" value="1" v-model="tipAmount">
+						<label for="one_usd">$1.00</label>
+					</div>
+					<div>
+						<input type="radio" value="2" v-model="tipAmount">
+						<label for="one_usd">$2.00</label>
+					</div>
+					<div>
+						<input type="radio" value="5" v-model="tipAmount">
+						<label for="one_usd">$5.00</label>
+					</div>
+
+					<div>
+						<input type="radio" value="-1" v-model="tipAmount">
+						<label for="custom_amount">Custom Amount</label>
+					</div>
+
 				</div>
-				<button id="tip-dec" @click.prevent="decTip">-</button>
+				<div v-if="tipAmount == -1">
+					<div id="custom-amount">
+						<span id="currency">$</span><input id="amount" v-model="customAmount" @blur="validateAmount" />
+					</div>
+					<div v-if="tipAmntErr" class="input-error">
+						Invalid amount. Please format as a dollar amount.
+					</div>
+				</div>
 			</div>
 			<div>
 				<div>
@@ -62,34 +62,13 @@
 				<label for="cardholder-name">Cardholder Name</label>
 				<input name="cardholder-name" type="text" placeholder="Your Name" />
 			</div>
-
-			<div id="card-info">
-				<label for="card-number">Card Number</label>
-				<input name="card-number" type="text" placeholder="1234 1234 1234 1234" />
-				<div class="igroup-flex">
-					<div>
-						<label for="expiry">Expiry</label>
-						<input name="expiry" type="text" placeholder="MM / YY" />
-					</div>
-					<div>
-						<label for="cvc">CVC</label>
-						<input name="cvc" type="text" placeholder="CVC" />
-					</div>
-				</div>
+			<div id="payment-element">
 			</div>
-
-			<div class="igroup-flex">
-				<div>
-					<label for="country">Country</label>
-					<input name="country" type="text" placeholder="US" />
-				</div>
-				<div>
-					<label for="zipcode">Zip</label>
-					<input name="zipcode" type="text" placeholder="123456" />
-				</div>
+			<div id="error-message">
 			</div>
 		</div>
 	</form>
 </div>
 {{/inline}}
+
 {{~> (parent)~}}

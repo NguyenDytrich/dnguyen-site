@@ -1,14 +1,18 @@
-#amount {
-	border: none;
-	outline: none;
-	font: inherit;
-	font-size: 2em;
-	width: 2em;
-	color: inherit;
+#tip-opt {
+	display: flex;
 }
 
-#tip-amount {
-	display: flex;
+#tip-opt div {
+	flex-grow: 1;
+}
+
+#tip-opt input[type='radio'] {
+	width: auto;
+}
+
+#tip-opt label {
+	display: inline-block;
+	width: auto;
 }
 
 #tip-display {
@@ -66,6 +70,15 @@ form label {
 	max-width: 25em;
 }
 
+#custom-amount input {
+	width: auto;
+	border: none;
+	outline: none;
+	font: inherit;
+	font-size: 2em;
+	color: inherit;
+}
+
 #contrib-checkbox label {
 	display: inline-block;
 }
@@ -73,4 +86,8 @@ form label {
 #contrib-checkbox input {
 	display: inline-block;
 	width: auto;
+}
+
+.input-error {
+	color: var(--red);
 }

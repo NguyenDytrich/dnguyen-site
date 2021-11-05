@@ -26,9 +26,14 @@ async fn main() {
                 routes::blog::blog_index,
                 routes::blog::blog_post,
                 routes::blog::blog,
+
             ])
         .mount("/tipjar", routes![
                routes::tipjar::index,
+            ])
+        .mount("/api", routes![
+                routes::tipjar::update_intent,
+                routes::tipjar::create_intent,
             ])
         .mount("/static", FileServer::from(static_dir))
         .register("/", catchers![not_found])
