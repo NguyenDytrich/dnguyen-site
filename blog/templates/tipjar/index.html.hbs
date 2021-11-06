@@ -7,7 +7,7 @@
 {{#*inline "page"}}
 <div vscope>
 	<h1>Tip Jar</h1>
-	<form id="payment-form">
+	<form id="payment-form" @submit="submit">
 		<div id="tipjar-container">
 			<h2>Amount</h2>
 			<div id="tip-amount">
@@ -67,6 +67,7 @@
 			<div id="error-message">
 			</div>
 		</div>
+		<button type="submit">Submit</button>
 	</form>
 </div>
 {{/inline}}

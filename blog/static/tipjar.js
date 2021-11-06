@@ -1,13 +1,15 @@
 import { createApp } from 'https://unpkg.com/petite-vue?module';
 
 let intent_id = '';
+let elements = undefined;
+let stripe = undefined;
 
 //Initialize Stripe
 fetch('/api/tipjar', {
 	method: 'POST',
 }).then(res => res.json())
 	.then(data => {
-		const stripe = Stripe(data.public_key);
+		stripe = Stripe(data.public_key);
 		const clientSecret = data.client_secret;
 		intent_id = data.intent_id;
 
@@ -15,7 +17,7 @@ fetch('/api/tipjar', {
 			clientSecret
 		};
 
-		const elements = stripe.elements(options);
+		elements = stripe.elements(options);
 		const paymentElement = elements.create('payment');
 		paymentElement.mount('#payment-element');
 	});
@@ -50,6 +52,15 @@ createApp({
 				intent_id: intent_id,
 				amount: amount,
 			})
+		});
+	},
+	async submit(e) {
+		e.preventDefault();
+		const { error } = await stripe.confirmPayment({
+			elements,
+			confirmParams: {
+				return_url: "http://localhost:8000/redirect/payment",
+			}
 		});
 	}
 }).mount()

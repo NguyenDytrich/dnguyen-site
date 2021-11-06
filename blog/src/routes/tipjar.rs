@@ -1,11 +1,12 @@
 use std::env;
 
-use rocket::{get, put, post};
+use rocket::{get, put, post, uri};
+use rocket::form::{FromForm};
+use rocket::response::Redirect;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_dyn_templates::Template;
 
 use stripe::PaymentIntentId;
-
 
 #[get("/")]
 pub async fn index() -> Template {
@@ -40,6 +41,7 @@ pub struct IntentResponse {
     client_secret: String,
     intent_id: PaymentIntentId
 }
+
 #[post("/tipjar")]
 pub async fn create_intent() -> Json<IntentResponse> {
     use stripe::{Client, PaymentIntent, CreatePaymentIntent, Currency};
@@ -56,4 +58,24 @@ pub async fn create_intent() -> Json<IntentResponse> {
         intent_id: intent.id
     };
     Json(res)
+}
+
+#[get("/thanks")]
+pub fn thanks() -> Template {
+    Template::render(
+        "tipjar/thanks", context! {
+            parent: "layout",
+        }
+    )
+}
+
+#[derive(FromForm)]
+pub struct StripeResponse<'r> {
+    payment_intent: &'r str
+}
+
+#[get("/redirect/payment?<stripe_response..>")]
+pub fn complete_payment(stripe_response: StripeResponse<'_>) -> Redirect {
+    println!("{:?} completed", stripe_response.payment_intent);
+    Redirect::to(uri!(thanks()))
 }

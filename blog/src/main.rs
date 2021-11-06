@@ -26,7 +26,8 @@ async fn main() {
                 routes::blog::blog_index,
                 routes::blog::blog_post,
                 routes::blog::blog,
-
+                routes::tipjar::thanks,
+                routes::tipjar::complete_payment
             ])
         .mount("/tipjar", routes![
                routes::tipjar::index,
