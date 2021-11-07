@@ -34,7 +34,6 @@ async fn main() {
             ])
         .mount("/api", routes![
                 routes::tipjar::update_intent,
-                routes::tipjar::create_intent,
             ])
         .mount("/static", FileServer::from(static_dir))
         .register("/", catchers![not_found])

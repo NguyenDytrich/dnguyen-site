@@ -1,26 +1,12 @@
 import { createApp } from 'https://unpkg.com/petite-vue?module';
 
-let intent_id = '';
-let elements = undefined;
-let stripe = undefined;
-
 //Initialize Stripe
-fetch('/api/tipjar', {
-	method: 'POST',
-}).then(res => res.json())
-	.then(data => {
-		stripe = Stripe(data.public_key);
-		const clientSecret = data.client_secret;
-		intent_id = data.intent_id;
+const stripe = Stripe('{{stripe_public_key}}');
 
-		const options = {
-			clientSecret
-		};
-
-		elements = stripe.elements(options);
-		const paymentElement = elements.create('payment');
-		paymentElement.mount('#payment-element');
-	});
+const clientSecret = document.getElementById("payment-form").dataset.secret
+const elements = stripe.elements({ clientSecret });
+const paymentElement = elements.create('payment');
+paymentElement.mount('#payment-element');
 
 createApp({
 	$delimiters: ['${', '}'],
@@ -49,7 +35,7 @@ createApp({
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				intent_id: intent_id,
+				client_secret: clientSecret,
 				amount: amount,
 			})
 		});

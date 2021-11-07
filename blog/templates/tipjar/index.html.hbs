@@ -7,7 +7,7 @@
 {{#*inline "page"}}
 <div vscope>
 	<h1>Tip Jar</h1>
-	<form id="payment-form" @submit="submit">
+	<form id="payment-form" @submit="submit" data-secret="{{ client_secret }}">
 		<div id="tipjar-container">
 			<h2>Amount</h2>
 			<div id="tip-amount">
