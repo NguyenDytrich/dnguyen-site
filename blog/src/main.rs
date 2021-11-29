@@ -21,13 +21,17 @@ async fn main() {
 
     let static_dir = &env::var("STATIC_DIR").unwrap_or(relative!("/static").to_string());
 
+    // Config checks
+    let _stripe_public_key = env::var("STRIPE_PUBLIC_KEY").expect("Stripe public key not provided");
+    let _stripe_secret_key = env::var("STRIPE_SECRET_KEY").expect("Stripe secret key not provided");
+
     let _server = rocket::build()
         .mount("/", routes![
                 routes::blog::blog_index,
                 routes::blog::blog_post,
                 routes::blog::blog,
                 routes::tipjar::thanks,
-                routes::tipjar::complete_payment
+                routes::tipjar::post_payment
             ])
         .mount("/tipjar", routes![
                routes::tipjar::index,

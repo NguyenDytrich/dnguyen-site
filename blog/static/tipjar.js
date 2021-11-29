@@ -1,7 +1,7 @@
 import { createApp } from 'https://unpkg.com/petite-vue?module';
 
 //Initialize Stripe
-const stripe = Stripe('{{stripe_public_key}}');
+const stripe = Stripe('pk_test_51IqOAQHJovnr3cb7w5jn9rMHREO8tlnHYEZp651nT8Sb8IrftlGVT5oyDDfnHtjPOCQARRjAlg6AP1T48CyfYuVq00K4LMtAvd');
 
 const clientSecret = document.getElementById("payment-form").dataset.secret
 const elements = stripe.elements({ clientSecret });
@@ -48,5 +48,8 @@ createApp({
 				return_url: "http://localhost:8000/redirect/payment",
 			}
 		});
+		if(error) {
+			// TODO: show modal
+		}
 	}
 }).mount()
