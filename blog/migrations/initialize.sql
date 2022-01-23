@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS blog_posts (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP WITH TIME ZONE,
-	published_at TIMESTAMP WITH TIME ZONE,
-	is_public BOOLEAN DEFAULT false,
-	markdown TEXT,
-	title VARCHAR(255) NOT NULL
-);
