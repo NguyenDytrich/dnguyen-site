@@ -43,6 +43,8 @@ async fn main() {
         .mount("/static", FileServer::from(static_dir))
         .mount("/", routes![
                blog::index,
+               blog::post,
+               blog::redirect_from_id_or_slug,
         ])
         .attach(Template::fairing())
         .attach(DbConn::fairing())

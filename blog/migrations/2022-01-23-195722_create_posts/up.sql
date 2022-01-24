@@ -6,5 +6,5 @@ CREATE TABLE blog_posts (
 	publish_state VARCHAR(255) NOT NULL DEFAULT 'draft',
 	body TEXT,
 	title VARCHAR(255) NOT NULL,
-	slug VARCHAR(255) NOT NULL
+	slug VARCHAR(255) UNIQUE NOT NULL
 );

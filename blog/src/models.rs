@@ -98,5 +98,9 @@ impl BlogPost {
         preview.push_str("...");
         Some(preview)
     }
+
+    pub fn render_html(&self) -> String {
+        transcribe(self.body.as_ref().unwrap_or(&String::new()))
+    }
 }
 
