@@ -241,7 +241,6 @@ dependencies = [
  "diesel_derives",
  "pq-sys",
  "r2d2",
- "uuid",
 ]
 
 [[package]]
@@ -278,7 +277,6 @@ dependencies = [
  "chrono",
  "diesel",
  "dotenv",
- "fake",
  "pandoc",
  "pulldown-cmark",
  "rocket",
@@ -286,7 +284,6 @@ dependencies = [
  "rocket_sync_db_pools",
  "serde",
  "tokio",
- "uuid",
 ]
 
 [[package]]
@@ -308,16 +305,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7896dc8abb250ffdda33912550faa54c88ec8b998dec0b2c55ab224921ce11df"
 dependencies = [
  "cfg-if 1.0.0",
-]
-
-[[package]]
-name = "fake"
-version = "2.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21a8531dd3a64fd1cfbe92fad4160bc2060489c6195fe847e045e5788f710bae"
-dependencies = [
- "chrono",
- "rand 0.8.4",
 ]
 
 [[package]]
@@ -2206,16 +2193,6 @@ name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
-
-[[package]]
-name = "uuid"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
-dependencies = [
- "getrandom 0.2.4",
- "serde",
-]
 
 [[package]]
 name = "vcpkg"

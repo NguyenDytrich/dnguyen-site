@@ -1,3 +1,11 @@
+#[macro_use]
+extern crate diesel;
+
+mod routes;
+mod schema;
+mod models;
+mod utils;
+
 use std::env;
 use std::path::Path;
 
@@ -5,9 +13,12 @@ use rocket::{routes, catch, catchers, figment};
 use rocket::fs::{FileServer, relative};
 use rocket::serde::{Serialize, Deserialize};
 use rocket_dyn_templates::Template;
+use rocket_sync_db_pools::{database};
 
-mod routes;
 use routes::{blog, error};
+
+#[database("postgres")]
+pub struct DbConn(diesel::PgConnection);
 
 #[rocket::main]
 async fn main() {
@@ -34,6 +45,7 @@ async fn main() {
                blog::index,
         ])
         .attach(Template::fairing())
+        .attach(DbConn::fairing())
         .register("/", catchers![
               error::not_found
         ])
