@@ -5,7 +5,8 @@ use rocket_dyn_templates::Template;
 
 use crate::DbConn;
 use crate::routes::{PaginatorPage, BaseContext};
-use crate::models::{BlogPost, BlogPostPreview};
+use crate::models::BlogPost;
+use crate::models::dto::BlogPostPreview;
 
 // TODO: modularize Contexts
 #[derive(rocket::serde::Serialize)]
@@ -57,6 +58,8 @@ pub async fn index(db_conn: DbConn) -> Template {
     })
 }
 
+// TODO (Dytrich Nguyen):
+// Maybe there's a way to redirect to the correct slug if the ID is right but slug isnt?
 #[get("/<post_id>/<_slug>")]
 pub async fn post(db_conn: DbConn, post_id: i32, _slug: String) -> Result<Template, Status> {
 
@@ -79,6 +82,8 @@ pub async fn post(db_conn: DbConn, post_id: i32, _slug: String) -> Result<Templa
     }
 }
 
+// TODO (Dytrich Nguyen):
+// Maybe write a fairing to carry a blog_post through to the post route?
 #[get("/<id_or_slug>")]
 pub async fn redirect_from_id_or_slug(db_conn: DbConn, id_or_slug: String) -> Result<Redirect, Status> {
 

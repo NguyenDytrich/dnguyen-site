@@ -9,9 +9,9 @@ mod utils;
 use std::env;
 use std::path::Path;
 
-use rocket::{routes, catch, catchers, figment};
+use rocket::{routes, catchers};
 use rocket::fs::{FileServer, relative};
-use rocket::serde::{Serialize, Deserialize};
+use rocket::serde::{Deserialize};
 use rocket_dyn_templates::Template;
 use rocket_sync_db_pools::{database};
 

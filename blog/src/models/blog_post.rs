@@ -1,22 +1,11 @@
-use std::convert::From;
-use std::io::Write;
-
 use chrono::prelude::*;
 use serde::Serialize;
 
-use crate::utils::htmlify::{monthify, transcribe};
-
-pub enum PublishState {
-    Draft,
-    Public,
-    Unlisted,
-    Archived,
-}
+use crate::utils::htmlify::transcribe;
 
 // TODO:
 // update to support multiple body formats
 // ex. HTML
-
 #[derive(Queryable, Serialize)]
 pub struct BlogPost {
     pub id: i32,
@@ -29,44 +18,8 @@ pub struct BlogPost {
     pub slug: String,
 }
 
-#[derive(Serialize)]
-pub struct BlogPostPreview {
-    pub id: i32,
-    pub title: String,
-    pub date_repr: String,
-    pub preview: String,
-    pub slug: String,
-}
-
-
-impl From<&BlogPost> for BlogPostPreview {
-    fn from(blog_post: &BlogPost) -> Self {
-
-        let date = match blog_post.published_at {
-            Some(d) => (d.day(), d.month(), d.year()),
-            None => (
-                blog_post.created_at.day(),
-                blog_post.created_at.month(),
-                blog_post.created_at.year())
-        };
-
-        BlogPostPreview {
-            id: blog_post.id,
-            title: blog_post.title.clone(),
-            slug: blog_post.slug.clone(),
-            date_repr: format!("{:02}, {} {}",
-                    date.0,
-                    monthify(date.1 as usize).unwrap_or("ERR".to_string()),
-                    date.2),
-            preview: transcribe(
-                &blog_post.content_preview()
-                    .unwrap_or(String::new())),
-        }
-    }
-}
-
 impl BlogPost {
-    fn content_preview(&self) -> Option<String> {
+    pub fn content_preview(&self) -> Option<String> {
 
         // Return if nothing to preview
         let body = match &self.body {
