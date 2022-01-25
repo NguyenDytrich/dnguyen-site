@@ -1,185 +1,136 @@
-use rocket::get;
+use rocket::{get, uri};
+use rocket::http::Status;
+use rocket::response::Redirect;
 use rocket_dyn_templates::Template;
 
-use dnguyen_blog::model::posts;
-use dnguyen_blog::model::posts::BlogPost;
-use dnguyen_blog::htmlify::{transcribe, monthify};
-use dnguyen_blog::http::dto::BlogPostPreview;
+use crate::DbConn;
+use crate::routes::{PaginatorPage, BaseContext};
+use crate::models::{BlogPost, PublishState};
+use crate::models::dto::BlogPostPreview;
 
-use chrono::prelude::*;
-use uuid::Uuid;
-
-fn gen_preview(markdown: &str) -> String {
-    if markdown.len() > 300 {
-        // String buffer
-        let mut preview = String::new();
-        // possible end of word chars
-        let c_eow = [' ', '\n', '\r'];
-
-        // index of end of word
-        let mut i_eow = 255;
-        let mut c: char = 'a'; // arbitrarily assign a char to start
-
-        while !c_eow.contains(&c) {
-            // Unwrap otherwise stop the search if index is OOB
-            c = markdown.chars().nth(i_eow).unwrap_or(' ');
-            i_eow = i_eow + 1;
-        }
-
-        preview.push_str(&markdown[0..(i_eow - 1)]);
-        preview.push_str("...");
-        preview
-
-    } else {
-        markdown.to_owned()
-    }
+// TODO: modularize Contexts
+#[derive(rocket::serde::Serialize)]
+struct BlogContext<'a> {
+    title: &'a str,
+    parent: &'a str,
+    paginator: PaginatorPage<BlogPostPreview>
 }
 
-async fn aggregate_blog_posts(count: i64, offset: i64) -> Vec<BlogPostPreview> {
-    let posts: Vec<BlogPost> = posts::retrieve_with_offset(count, offset)
-        .await
-        .unwrap_or(Vec::new());
-
-    // Cast to the data object
-    let mut mapped_posts: Vec<BlogPostPreview> = Vec::new();
-    for p in posts.iter() {
-        let date = match p.published_at {
-            Some(d) => (d.day(), d.month(), d.year()),
-            None => (p.created_at.day(), p.created_at.month(), p.created_at.year())
-        };
-
-        let preview = gen_preview(
-            &p.markdown.to_owned().unwrap_or(String::new())
-        );
-
-        let post = BlogPostPreview {
-            uuid_repr: p.uuid.to_string(),
-            title: p.title.to_owned(),
-            date_repr: format!("{:02}, {} {}", 
-                date.0, 
-                monthify(date.1 as usize).unwrap_or("ERR".to_string()),
-                date.2),
-            preview: transcribe(&preview)
-        };
-        mapped_posts.insert(0, post);
-    }
-
-    mapped_posts.reverse();
-    mapped_posts
+#[derive(rocket::serde::Serialize)]
+struct PostContext<'a> {
+    title: &'a str,
+    parent: &'a str,
+    content: String
 }
 
 #[get("/")]
-pub async fn blog_index() -> Template {
-    let num_retrieved = 5;
-    let mapped_posts = aggregate_blog_posts(num_retrieved, 0).await;
-
-    // Calculate pagination
-    let count = posts::get_post_count().await.unwrap_or(0);
-    let pages = count as f64 / num_retrieved as f64;
-    let pages = pages.ceil() as i64;
-    let next = pages > 1;
-    let pages = if pages > 0 {pages} else {1};
-
-    // Show no posts if there are no posts
-    if count == 0 {
-        return Template::render("blog/no_posts", context! {
-            title: "Blog",
-            parent: "layout"
-        });
-    }
-
-    Template::render("blog/blog_index", context! {
-        title: "Blog",
-        parent: "layout",
-        blog_posts: mapped_posts,
-        paginate: context! {
-            prev: false,
-            next: next,
-            current: 1,
-            prev_page: 0,
-            next_page: 2,
-            total: pages
-        }
-    })
+pub async fn index(db_conn: DbConn) -> Result<Template, Status> {
+    page(db_conn, 1).await
 }
 
 #[get("/?<page>")]
-pub async fn blog(mut page: isize) -> Template {
+pub async fn page(db_conn: DbConn, page: i64) -> Result<Template, Status> {
+
+    use crate::schema::blog_posts::dsl::*;
+    use crate::diesel::query_dsl::*;
+    use crate::diesel::dsl::count_star;
+    use rocket_sync_db_pools::diesel::RunQueryDsl;
 
     if page <= 0 {
-        page = 1;
+        return Err(Status::NotFound)
     }
 
-    let num_retrieved = 5;
-    let mapped_posts = aggregate_blog_posts(
-        num_retrieved, num_retrieved * (page - 1) as i64
-    ).await;
+    // TODO (Dytrich Nguyen): make configurable
+    let paginate_by = 5;
 
-    // Calculate pagination
-    let count = posts::get_post_count().await.unwrap_or(0);
-    let pages = count as f64 / num_retrieved as f64;
+    // Get count of all posts
+    let count: i64 = db_conn.run(move |c| {
+        blog_posts.select(count_star()).first(c)
+    }).await.unwrap_or(-1);
+
+    if page > count {
+        return Err(Status::NotFound)
+    }
+
+    // Select a number of posts
+    let posts: Vec<BlogPost> = db_conn.run(move |c| {
+        blog_posts
+            .offset(paginate_by * (page - 1))
+            .limit(5)
+            .load(c)
+    }).await.unwrap_or(Vec::new());
+
+    let previews: Vec<BlogPostPreview> = posts.iter()
+        .map(|p| BlogPostPreview::from(p)).collect();
+
+    let pages = count as f64 / paginate_by as f64;
     let pages = pages.ceil() as i64;
-    let next = pages > page as i64;
     let pages = if pages > 0 {pages} else {1};
+    let next = pages > page;
     let prev = page > 1;
 
-    // Show no posts if there are no posts
-    if count == 0 {
-        return Template::render("blog/no_posts", context! {
-            title: "Blog",
-            parent: "layout"
-        });
-    }
-
-    if pages >= page as i64 {
-        Template::render("blog/blog_index", context! {
+    Ok(Template::render(
+        "blog/index", BlogContext {
             title: "Blog",
             parent: "layout",
-            blog_posts: mapped_posts,
-            paginate: context! {
-                prev: prev,
-                next: next,
-                current: page,
-                next_page: page + 1,
-                prev_page: page - 1,
-                total: pages
+            paginator: PaginatorPage {
+                index: page,
+                has_next: next,
+                next_index: page + 1,
+                has_prev: prev,
+                prev_index: page - 1,
+                total_pages: pages,
+                objects: previews
             }
-        })
-    } else {
-        Template::render(
-            "error/404", context! {
-                title: "404",
-                parent: "layout"
-            }
-        )
-    }
-
+        }))
 }
 
-#[get("/<post_id>")]
-pub async fn blog_post(post_id: String) -> Template {
-    let u = Uuid::parse_str(&post_id);
-    let post: Option<BlogPost>  = match u {
-        Ok(uuid) => posts::retrieve_by_uuid(uuid)
-                        .await
-                        .map_or(None, |v| Some(v)),
-        Err(_) => None
+// TODO (Dytrich Nguyen):
+// Maybe there's a way to redirect to the correct slug if the ID is right but slug isnt?
+#[get("/<post_id>/<_slug>")]
+pub async fn post(db_conn: DbConn, post_id: i32, _slug: String) -> Result<Template, Status> {
+
+    use crate::schema::blog_posts::dsl::*;
+    use crate::diesel::query_dsl::*;
+    use rocket_sync_db_pools::diesel::RunQueryDsl;
+
+    let result: Result<BlogPost, diesel::result::Error> = db_conn.run(move |c| {
+        blog_posts.find(post_id).first(c)
+    }).await;
+
+    match result {
+        Ok(post) => Ok(Template::render(
+            "blog/post", PostContext {
+                title: &post.title,
+                parent: "layout",
+                content: post.render_html()
+            })),
+        Err(_) => Err(Status::NotFound)
+    }
+}
+
+// TODO (Dytrich Nguyen):
+// Maybe write a fairing to carry a blog_post through to the post route?
+#[get("/<id_or_slug>")]
+pub async fn redirect_from_id_or_slug(db_conn: DbConn, id_or_slug: String) -> Result<Redirect, Status> {
+
+    use crate::schema::blog_posts::dsl::*;
+    use crate::diesel::query_dsl::*;
+    use crate::diesel::expression_methods::*;
+    use rocket_sync_db_pools::diesel::RunQueryDsl;
+
+    let result: Result<(i32, String), diesel::result::Error> = match id_or_slug.parse::<i32>() {
+        Ok(i) => db_conn.run(move |c| {
+                blog_posts.find(i).select((id, slug)).first(c)
+            }).await,
+        // Could not parse int, so maybe it's a slug:
+        Err(_) => db_conn.run(|c| {
+                blog_posts.filter(slug.eq(id_or_slug)).select((id, slug)).first(c)
+            }).await
     };
 
-    return match post {
-        Some(v) => Template::render(
-            "blog/post", context! {
-                title: v.title,
-                parent: "layout",
-                content: transcribe(
-                    // Parse the markdown to HTML
-                    &v.markdown.unwrap_or(String::new())
-                )
-            }),
-        None => Template::render(
-            "error/404", context! {
-                title: "404",
-                parent: "layout"
-            })
+    match result {
+        Ok(v) => Ok(Redirect::to(uri!(post(v.0, v.1)))),
+        Err(_) => Err(Status::NotFound)
     }
 }

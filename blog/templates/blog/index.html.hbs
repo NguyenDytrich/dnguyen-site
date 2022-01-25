@@ -1,11 +1,11 @@
 {{#*inline "page"}}
 <div>
 	<ul class="p-0">
-	{{#each blog_posts}}
+	{{#each paginator.objects}}
 	<li>
 		<div>
 			<div class="blog-heading">
-				<h2><a class="title-link" href="/{{uuid_repr}}">{{title}}</a></h2>
+				<h2><a class="title-link" href="/{{id}}/{{slug}}">{{title}}</a></h2>
 				<div class="date">{{date_repr}}</div>
 			</div>
 			<div class="blog-preview">
@@ -14,7 +14,7 @@
 				</div>
 			</div>
 			<div class="blog-continue">
-				<a class="highlight" href="/{{uuid_repr}}">Continue</a>
+				<a class="highlight" href="/{{id}}/{{slug}}">Continue</a>
 			</div>
 		</div>
 	</li>
@@ -22,18 +22,18 @@
 	</ul>
 </div>
 <div class="text-center">
-	{{#with paginate}}
+	{{#with paginator}}
 	<a class="paginate"
-		{{#if prev}}
-		 href="/?page={{prev_page}}"
+		{{#if has_prev}}
+		 href="/?page={{prev_index}}"
 		{{else}}
 		style="opacity:0; cursor: default;"
 		{{/if}}
 	>prev</a>
-	{{current}} of {{total}}
+	{{index}} of {{total_pages}}
 	<a class="paginate"
-		{{#if next}}
-		href="/?page={{next_page}}"
+		{{#if has_next}}
+		href="/?page={{next_index}}"
 		{{else}}
 		style="opacity:0; cursor: default;"
 		{{/if}}

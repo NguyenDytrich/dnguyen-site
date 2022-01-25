@@ -1,35 +1,57 @@
-use rocket::{routes, catch, catchers};
-use rocket::fs::{FileServer, relative};
-use rocket_dyn_templates::Template;
-
-use dotenv::dotenv;
-use std::env;
+#[macro_use]
+extern crate diesel;
 
 mod routes;
+mod schema;
+mod models;
+mod utils;
 
-#[catch(404)]
-fn not_found() -> Template {
-    Template::render("error/404", context! {
-        title: "404",
-        parent: "layout"
-    })
-}
+use std::env;
+use std::path::Path;
+
+use rocket::{routes, catchers};
+use rocket::fs::{FileServer, relative};
+use rocket::serde::{Deserialize};
+use rocket_dyn_templates::Template;
+use rocket_sync_db_pools::{database};
+
+use routes::{blog, error};
+
+#[database("postgres")]
+pub struct DbConn(diesel::PgConnection);
 
 #[rocket::main]
 async fn main() {
-    dotenv().ok();
 
-    let static_dir = &env::var("STATIC_DIR").unwrap_or(relative!("/static").to_string());
+    // Custom config
+    #[derive(Deserialize)]
+    struct Config<'a> {
+        static_dir: Option<&'a str>,
+    }
 
-    let _server = rocket::build()
-        .mount("/", routes![
-                routes::blog::blog_index,
-                routes::blog::blog_post,
-                routes::blog::blog,
-            ])
+    let figment = rocket::Config::figment();
+    let config: Config = figment.extract().expect("Error extracting config");
+
+    // Get the configured static directory
+    // otherwise just use the one in current directory
+    let static_dir = match config.static_dir {
+        Some(val) => Path::new(val),
+        None => Path::new(relative!("static"))
+    };
+
+    let _server = rocket::custom(figment)
         .mount("/static", FileServer::from(static_dir))
-        .register("/", catchers![not_found])
+        .mount("/", routes![
+               blog::index,
+               blog::page,
+               blog::post,
+               blog::redirect_from_id_or_slug,
+        ])
         .attach(Template::fairing())
+        .attach(DbConn::fairing())
+        .register("/", catchers![
+              error::not_found
+        ])
         .launch()
         .await;
 }
