@@ -5,7 +5,7 @@ use rocket_dyn_templates::Template;
 
 use crate::DbConn;
 use crate::routes::{PaginatorPage, BaseContext};
-use crate::models::BlogPost;
+use crate::models::{BlogPost, PublishState};
 use crate::models::dto::BlogPostPreview;
 
 // TODO: modularize Contexts
@@ -27,10 +27,13 @@ struct PostContext<'a> {
 pub async fn index(db_conn: DbConn) -> Template {
 
     use crate::schema::blog_posts::dsl::*;
+    use crate::diesel::query_dsl::*;
     use rocket_sync_db_pools::diesel::RunQueryDsl;
 
     let posts: Vec<BlogPost> = db_conn.run(|c| {
-        blog_posts.load(c)
+        blog_posts
+            .limit(5)
+            .load(c)
     }).await.unwrap_or(Vec::new());
 
     if posts.len() == 0 {
@@ -45,8 +48,10 @@ pub async fn index(db_conn: DbConn) -> Template {
 
     let page = PaginatorPage {
         index: -1,
-        next_page: -1,
-        prev_page: -1,
+        has_next: false,
+        next_index: -1,
+        prev_index: -1,
+        has_prev: false,
         total_pages: 0,
         objects: previews
    };
@@ -56,6 +61,63 @@ pub async fn index(db_conn: DbConn) -> Template {
         parent: "layout",
         paginator: page
     })
+}
+
+#[get("/?<page>")]
+pub async fn page(db_conn: DbConn, mut page: i64) -> Result<Template, Status> {
+
+    use crate::schema::blog_posts::dsl::*;
+    use crate::diesel::query_dsl::*;
+    use crate::diesel::dsl::count_star;
+    use rocket_sync_db_pools::diesel::RunQueryDsl;
+
+    if page <= 0 {
+        return Err(Status::NotFound)
+    }
+
+    // TODO: config
+    let paginate_by = 5;
+
+    // Get count of all posts
+    let count: i64 = db_conn.run(move |c| {
+        blog_posts.select(count_star()).first(c)
+    }).await.unwrap_or(-1);
+
+    if page > count {
+        return Err(Status::NotFound)
+    }
+
+    // Select a number of posts
+    let posts: Vec<BlogPost> = db_conn.run(move |c| {
+        blog_posts
+            .offset(paginate_by * (page - 1))
+            .limit(5)
+            .load(c)
+    }).await.unwrap_or(Vec::new());
+
+    let previews: Vec<BlogPostPreview> = posts.iter()
+        .map(|p| BlogPostPreview::from(p)).collect();
+
+    let pages = count as f64 / paginate_by as f64;
+    let pages = pages.ceil() as i64;
+    let pages = if pages > 0 {pages} else {1};
+    let next = pages > page;
+    let prev = page > 1;
+
+    Ok(Template::render(
+        "blog/index", BlogContext {
+            title: "Blog",
+            parent: "layout",
+            paginator: PaginatorPage {
+                index: page,
+                has_next: next,
+                next_index: page + 1,
+                has_prev: prev,
+                prev_index: page - 1,
+                total_pages: pages,
+                objects: previews
+            }
+        }))
 }
 
 // TODO (Dytrich Nguyen):

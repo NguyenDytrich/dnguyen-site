@@ -43,6 +43,7 @@ async fn main() {
         .mount("/static", FileServer::from(static_dir))
         .mount("/", routes![
                blog::index,
+               blog::page,
                blog::post,
                blog::redirect_from_id_or_slug,
         ])

@@ -6,10 +6,12 @@ struct BaseContext<'a> {
 
 #[derive(rocket::serde::Serialize)]
 struct PaginatorPage<T> {
-    index: isize,
-    next_page: isize,
-    prev_page: isize,
-    total_pages: usize,
+    index: i64,
+    has_next: bool,
+    next_index: i64,
+    has_prev: bool,
+    prev_index: i64,
+    total_pages: i64,
     objects: Vec<T>
 }
 
