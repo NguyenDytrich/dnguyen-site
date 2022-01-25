@@ -24,47 +24,12 @@ struct PostContext<'a> {
 }
 
 #[get("/")]
-pub async fn index(db_conn: DbConn) -> Template {
-
-    use crate::schema::blog_posts::dsl::*;
-    use crate::diesel::query_dsl::*;
-    use rocket_sync_db_pools::diesel::RunQueryDsl;
-
-    let posts: Vec<BlogPost> = db_conn.run(|c| {
-        blog_posts
-            .limit(5)
-            .load(c)
-    }).await.unwrap_or(Vec::new());
-
-    if posts.len() == 0 {
-        return Template::render("blog/no_posts", BaseContext {
-            title: "Blog",
-            parent: "layout"
-        });
-    }
-
-    let previews: Vec<BlogPostPreview> = posts.iter()
-        .map(|p| BlogPostPreview::from(p)).collect();
-
-    let page = PaginatorPage {
-        index: -1,
-        has_next: false,
-        next_index: -1,
-        prev_index: -1,
-        has_prev: false,
-        total_pages: 0,
-        objects: previews
-   };
-
-    Template::render("blog/index", BlogContext {
-        title: "Blog",
-        parent: "layout",
-        paginator: page
-    })
+pub async fn index(db_conn: DbConn) -> Result<Template, Status> {
+    page(db_conn, 1).await
 }
 
 #[get("/?<page>")]
-pub async fn page(db_conn: DbConn, mut page: i64) -> Result<Template, Status> {
+pub async fn page(db_conn: DbConn, page: i64) -> Result<Template, Status> {
 
     use crate::schema::blog_posts::dsl::*;
     use crate::diesel::query_dsl::*;
@@ -75,7 +40,7 @@ pub async fn page(db_conn: DbConn, mut page: i64) -> Result<Template, Status> {
         return Err(Status::NotFound)
     }
 
-    // TODO: config
+    // TODO (Dytrich Nguyen): make configurable
     let paginate_by = 5;
 
     // Get count of all posts
