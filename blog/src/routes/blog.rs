@@ -34,6 +34,7 @@ pub async fn page(db_conn: DbConn, page: i64) -> Result<Template, Status> {
     use crate::schema::blog_posts::dsl::*;
     use crate::diesel::query_dsl::*;
     use crate::diesel::dsl::count_star;
+    use crate::diesel::ExpressionMethods;
     use rocket_sync_db_pools::diesel::RunQueryDsl;
 
     if page <= 0 {
@@ -55,6 +56,7 @@ pub async fn page(db_conn: DbConn, page: i64) -> Result<Template, Status> {
     // Select a number of posts
     let posts: Vec<BlogPost> = db_conn.run(move |c| {
         blog_posts
+            .order(created_at.desc())
             .offset(paginate_by * (page - 1))
             .limit(5)
             .load(c)
